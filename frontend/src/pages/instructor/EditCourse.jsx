@@ -31,9 +31,14 @@ const EditCourse = () => {
     // Content Upload Wizard State
     const [showContentWizard, setShowContentWizard] = useState(false);
     const [selectedContentType, setSelectedContentType] = useState('video');
+    const [showContentTypeSelector, setShowContentTypeSelector] = useState(false);
+
+    // Instructors list for responsible user dropdown
+    const [instructors, setInstructors] = useState([]);
 
     useEffect(() => {
         fetchCourse();
+        fetchInstructors();
     }, [id]);
 
     const fetchCourse = async () => {
@@ -45,11 +50,28 @@ const EditCourse = () => {
             setValue('description', res.data.description);
             setValue('published', res.data.published);
             setValue('price', res.data.price);
+            setValue('visibility', res.data.visibility || 'everyone');
+            setValue('accessRule', res.data.accessRule || 'open');
+            setValue('responsibleUser', res.data.responsibleUser || '');
         } catch (error) {
             toast.error('Failed to load course');
             navigate('/instructor/courses');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchInstructors = async () => {
+        try {
+            const response = await fetch('/api/v1/auth/instructors', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.success) {
+                setInstructors(data.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch instructors:', error);
         }
     };
 
@@ -128,7 +150,7 @@ const EditCourse = () => {
 
             <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
                 <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1 mb-6">
-                    {['Details', 'Content', 'Options', 'Quiz'].map((category) => (
+                    {['Details', 'Description', 'Content', 'Options', 'Quiz'].map((category) => (
                         <Tab
                             key={category}
                             className={({ selected }) =>
@@ -163,6 +185,34 @@ const EditCourse = () => {
                         </div>
                     </Tab.Panel>
 
+                    {/* Description Tab */}
+                    <Tab.Panel>
+                        <div className="bg-white p-6 rounded shadow">
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Course Description
+                                    </label>
+                                    <p className="text-xs text-gray-500 mb-3">
+                                        Provide a detailed description of what students will learn in this course. This will be displayed on the course page.
+                                    </p>
+                                    <textarea
+                                        {...register('description')}
+                                        rows={12}
+                                        placeholder="This course covers the functional configuration of Odoo CRM, including lead management, opportunity workflows, pipeline stages, and activity scheduling. It also explains CRM reporting, automation rules, and integration with Sales for end-to-end process handling."
+                                        className="mt-1 block w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Save Description
+                                </button>
+                            </form>
+                        </div>
+                    </Tab.Panel>
+
                     {/* Content Tab (Lessons) */}
                     <Tab.Panel>
                         <div className="bg-white p-6 rounded-lg shadow">
@@ -173,7 +223,7 @@ const EditCourse = () => {
                                     <p className="text-sm text-gray-500 mt-1">Manage your lessons and learning materials</p>
                                 </div>
                                 <button
-                                    onClick={() => setShowContentWizard(true)}
+                                    onClick={() => setShowContentTypeSelector(true)}
                                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md"
                                 >
                                     <PlusIcon className="w-5 h-5" />
@@ -250,12 +300,50 @@ const EditCourse = () => {
                                     <h3 className="text-lg font-medium text-gray-700 mb-2">No content yet</h3>
                                     <p className="text-sm text-gray-500 mb-4">Start by adding your first lesson</p>
                                     <button
-                                        onClick={() => setShowContentWizard(true)}
+                                        onClick={() => setShowContentTypeSelector(true)}
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
                                     >
                                         <PlusIcon className="w-5 h-5" />
                                         Add Your First Content
                                     </button>
+                                </div>
+                            )}
+
+                            {/* Content Type Selector Modal */}
+                            {showContentTypeSelector && (
+                                <div className="fixed inset-0 z-50 overflow-y-auto">
+                                    <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                                        {/* Background overlay */}
+                                        <div
+                                            className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                                            onClick={() => setShowContentTypeSelector(false)}
+                                        ></div>
+
+                                        {/* Modal panel */}
+                                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                            <div className="bg-white px-6 py-6">
+                                                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                                    Select Content Type
+                                                </h3>
+                                                <ContentTypeSelector
+                                                    selected={selectedContentType}
+                                                    onChange={(type) => {
+                                                        setSelectedContentType(type);
+                                                        setShowContentTypeSelector(false);
+                                                        setShowContentWizard(true);
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="bg-gray-50 px-6 py-3 flex justify-end">
+                                                <button
+                                                    onClick={() => setShowContentTypeSelector(false)}
+                                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
@@ -331,6 +419,27 @@ const EditCourse = () => {
                                     <p className="mt-1 text-xs text-gray-500">Only applicable if Access Rule is 'Payment'.</p>
                                 </div>
 
+                                {/* Responsible User */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Course Admin (Responsible User)
+                                    </label>
+                                    <p className="text-xs text-gray-500 mb-3">
+                                        Decide who'll be the responsible of the course
+                                    </p>
+                                    <select
+                                        {...register('responsibleUser')}
+                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border"
+                                    >
+                                        <option value="">Select instructor...</option>
+                                        {instructors.map(instructor => (
+                                            <option key={instructor._id} value={instructor._id}>
+                                                {instructor.name} ({instructor.email})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
                                 <div className="border-t pt-4">
                                     <button
                                         type="submit"
@@ -362,7 +471,13 @@ const EditCourse = () => {
                                 </button>
                             </div>
 
-                            {course.quizzes && course.quizzes.length > 0 ? (
+                            {(() => {
+                                console.log('Quiz Debug - course.quizzes:', course?.quizzes);
+                                console.log('Quiz Debug - quizzes length:', course?.quizzes?.length);
+                                return null;
+                            })()}
+
+                            {course?.quizzes && course.quizzes.length > 0 ? (
                                 <div className="space-y-4">
                                     {course.quizzes.map((quiz) => (
                                         <div key={quiz._id} className="border rounded-lg p-4 flex justify-between items-center hover:bg-gray-50">

@@ -17,7 +17,7 @@ const QuizAttemptSchema = new mongoose.Schema({
     },
     pointsEarned: {
         type: Number,
-        required: true,
+        default: 0,
     },
     attemptNumber: {
         type: Number,

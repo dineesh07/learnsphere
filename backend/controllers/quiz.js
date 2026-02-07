@@ -74,51 +74,69 @@ exports.createQuiz = async (req, res, next) => {
 // @access  Private
 exports.submitQuizAttempt = async (req, res, next) => {
     try {
+        console.log('=== Quiz Submission Start ===');
+        console.log('Quiz ID:', req.params.id);
+        console.log('User:', req.user?.id);
+        console.log('Answers:', JSON.stringify(req.body.answers, null, 2));
+
         const quiz = await Quiz.findById(req.params.id);
         if (!quiz) {
+            console.error('Quiz not found');
             return res.status(404).json({ success: false, error: 'Quiz not found' });
         }
+        console.log('Quiz found:', quiz.title);
 
         const { answers } = req.body; // Array of { questionId, selectedOption }
+
+        if (!answers || !Array.isArray(answers)) {
+            console.error('Invalid answers format');
+            return res.status(400).json({ success: false, error: 'Answers must be an array' });
+        }
 
         let score = 0;
         let totalQuestions = quiz.questions.length;
         let pointsEarned = 0;
 
+        console.log('Calculating score...');
         // Calculate score
         answers.forEach(ans => {
             const question = quiz.questions.id(ans.questionId);
             if (question) {
+                console.log(`\nQuestion ID: ${ans.questionId}`);
+                console.log(`Selected option: ${ans.selectedOption}`);
+                console.log(`Question options:`, question.options.map(o => ({ id: o._id.toString(), text: o.text, isCorrect: o.isCorrect })));
+
                 const correctOption = question.options.find(opt => opt.isCorrect);
-                // Compare text or ID if available. Simplest is text if unique, or we should use IDs for options.
-                // Assuming selectedOption returns option text or ID. Let's assume text for simplicity or ID.
-                // If Model definitions didn't use IDs for options explicitly, Mongoose adds _id.
-                // Let's assume passed selectedOption is the option _id or text. 
-                // For robustness, let's assume it matches one of the option's text or _id.
-                if (correctOption && (ans.selectedOption === correctOption.text || ans.selectedOption === correctOption._id.toString())) {
-                    score += 1; // Or question.points
+                console.log(`Correct option ID: ${correctOption?._id.toString()}`);
+
+                // Convert both to strings for comparison
+                const selectedOptionStr = ans.selectedOption.toString();
+                const correctOptionStr = correctOption?._id.toString();
+
+                console.log(`Comparing: "${selectedOptionStr}" === "${correctOptionStr}"`);
+
+                if (correctOption && selectedOptionStr === correctOptionStr) {
+                    score += 1;
+                    console.log('  ✓ CORRECT!');
+                } else {
+                    console.log('  ✗ INCORRECT');
                 }
+            } else {
+                console.log(`Question ${ans.questionId} not found in quiz`);
             }
         });
 
+        console.log(`Final score: ${score}/${totalQuestions}`);
+
         // Determine attempt number
+        console.log('Counting previous attempts...');
         const previousAttempts = await QuizAttempt.countDocuments({ user: req.user.id, quiz: req.params.id });
         const attemptNumber = previousAttempts + 1;
-
-        // Calculate points based on rewards logic
-        // Logic: First try -> X points, etc.
-        // Only award points if score is sufficient? Or just for completing?
-        // User requirement: "Quizzes support multiple attempts and award points based on the attempt number." 
-        // Usually points are awarded if PASSING. Let's assume passing is > 50% or ANY completion?
-        // "Learners get badges based on total points."
-        // Let's assume points are awarded if score > some threshold, or just strictly based on attempt.
-        // For simplicity: Award points if score == totalQuestions (perfect) or maybe just for attempting?
-        // Re-reading: "Reward points based on attempt number".
-        // I'll assume if score percentage > 70% or something. Or just give points. 
-        // Let's use > 50% score to award points.
+        console.log('Attempt number:', attemptNumber);
 
         const percentage = (score / totalQuestions) * 100;
         const isPass = percentage >= 50;
+        console.log(`Percentage: ${percentage}%, Pass: ${isPass}`);
 
         if (isPass) {
             if (attemptNumber === 1) pointsEarned = quiz.rewards.firstAttempt;
@@ -126,8 +144,10 @@ exports.submitQuizAttempt = async (req, res, next) => {
             else if (attemptNumber === 3) pointsEarned = quiz.rewards.thirdAttempt;
             else pointsEarned = quiz.rewards.moreAttempts;
         }
+        console.log('Points earned:', pointsEarned);
 
         // Record attempt
+        console.log('Creating attempt record...');
         const attempt = await QuizAttempt.create({
             user: req.user.id,
             quiz: req.params.id,
@@ -136,26 +156,50 @@ exports.submitQuizAttempt = async (req, res, next) => {
             attemptNumber,
             answers
         });
+        console.log('Attempt created:', attempt._id);
 
         // Update user points if points earned
         if (pointsEarned > 0) {
+            console.log('Updating user points...');
             const user = await User.findById(req.user.id);
-            user.points += pointsEarned;
-
-            // Recalculate badge
-            user.badge = user.calculateBadge();
+            user.points = (user.points || 0) + pointsEarned;
             await user.save();
+            console.log('User points updated to:', user.points);
         }
 
-        res.status(200).json({
+        console.log('=== Quiz Submission Success ===');
+
+        const responseData = {
             success: true,
-            data: attempt,
+            data: {
+                _id: attempt._id,
+                user: attempt.user,
+                quiz: attempt.quiz,
+                score: attempt.score,
+                pointsEarned: attempt.pointsEarned,
+                attemptNumber: attempt.attemptNumber,
+                answers: attempt.answers,
+                completedAt: attempt.completedAt
+            },
+            score,
             pointsEarned,
-            badge: req.user.badge // Return new badge status (might need refetching user or update req.user)
-        });
+            attemptNumber
+        };
+
+        console.log('Sending response:', JSON.stringify(responseData, null, 2));
+        res.status(200).json(responseData);
 
     } catch (err) {
-        next(err);
+        console.error('=== Quiz Submission Error ===');
+        console.error('Error name:', err.name);
+        console.error('Error message:', err.message);
+        console.error('Error stack:', err.stack);
+
+        res.status(500).json({
+            success: false,
+            error: err.message || 'Failed to submit quiz',
+            details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
     }
 };
 

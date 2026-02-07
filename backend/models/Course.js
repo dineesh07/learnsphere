@@ -49,6 +49,11 @@ const CourseSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    responsibleUser: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        // Optional - defaults to instructor if not set
+    },
     lessonsCount: {
         type: Number,
         default: 0

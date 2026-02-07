@@ -160,6 +160,35 @@ const CoursePlayer = () => {
                             </button>
                         );
                     })}
+
+                    {/* Standalone Quizzes */}
+                    {course.quizzes && course.quizzes.filter(q => !q.lesson).length > 0 && (
+                        <>
+                            <div className="px-4 py-2 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Quizzes
+                            </div>
+                            {course.quizzes.filter(q => !q.lesson).map((quiz, index) => (
+                                <button
+                                    key={quiz._id}
+                                    onClick={() => {
+                                        setActiveLesson({ _id: quiz._id, title: quiz.title, type: 'quiz', isStandaloneQuiz: true, quiz: quiz });
+                                        setShowMobileMenu(false);
+                                    }}
+                                    className={`w-full text-left p-4 hover:bg-gray-50 flex items-start gap-3 border-b border-gray-100 transition-colors ${activeLesson?._id === quiz._id ? 'bg-indigo-50 border-l-4 border-l-indigo-600' : 'border-l-4 border-l-transparent'}`}
+                                >
+                                    <div className="mt-0.5 min-w-[20px]">
+                                        <HelpCircle size={20} className="text-indigo-500" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium leading-snug text-gray-900">{quiz.title}</p>
+                                        <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
+                                            <span>{quiz.questions?.length || 0} Questions</span>
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -210,25 +239,34 @@ const CoursePlayer = () => {
                                             height="100%"
                                             controls
                                             playing={false}
+                                            config={{
+                                                youtube: {
+                                                    playerVars: { showinfo: 1 }
+                                                }
+                                            }}
                                         />
                                     </div>
                                 )}
 
                                 {activeLesson.type === 'quiz' && (
                                     <div className="p-8">
-                                        {activeQuiz ? (
-                                            <QuizTaker
-                                                courseId={id}
-                                                quizId={activeQuiz._id}
-                                                onComplete={handleQuizComplete}
-                                            />
-                                        ) : (
-                                            <div className="text-center py-20">
-                                                <HelpCircle className="mx-auto h-16 w-16 text-gray-300 mb-4" />
-                                                <h3 className="text-xl font-bold text-gray-400">Quiz not found</h3>
-                                                <p className="text-gray-500">The quiz for this lesson appears to be missing.</p>
-                                            </div>
-                                        )}
+                                        {(() => {
+                                            // Check if it's a standalone quiz or lesson-linked quiz
+                                            const quizToShow = activeLesson.isStandaloneQuiz ? activeLesson.quiz : activeQuiz;
+                                            return quizToShow ? (
+                                                <QuizTaker
+                                                    courseId={id}
+                                                    quizId={quizToShow._id}
+                                                    onComplete={handleQuizComplete}
+                                                />
+                                            ) : (
+                                                <div className="text-center py-20">
+                                                    <HelpCircle className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+                                                    <h3 className="text-xl font-bold text-gray-400">Quiz not found</h3>
+                                                    <p className="text-gray-500">The quiz for this lesson appears to be missing.</p>
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 )}
 

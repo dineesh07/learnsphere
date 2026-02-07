@@ -7,6 +7,7 @@ import Layout from './components/Layout';
 import CoursesDashboard from './pages/instructor/CoursesDashboard';
 import CreateCourse from './pages/instructor/CreateCourse';
 import EditCourse from './pages/instructor/EditCourse';
+import ReportingDashboard from './pages/instructor/ReportingDashboard';
 import MyCourses from './pages/learner/MyCourses';
 import BrowseCourses from './pages/learner/BrowseCourses';
 import CoursePlayer from './pages/learner/CoursePlayer';
@@ -81,6 +82,11 @@ function App() {
           <Route path="instructor/courses/:id/edit" element={
             <ProtectedRoute roles={['instructor', 'admin']}>
               <EditCourse />
+            </ProtectedRoute>
+          } />
+          <Route path="instructor/reporting" element={
+            <ProtectedRoute roles={['instructor', 'admin']}>
+              <ReportingDashboard />
             </ProtectedRoute>
           } />
 

@@ -36,12 +36,19 @@ const QuizTaker = ({ courseId, quizId, onComplete }) => {
 
         try {
             const res = await quizService.submitAttempt(courseId, quizId, { answers: formattedAnswers });
-            setResult(res.data); // data is attempt format needs checking
-            // Backend returns: { success: true, data: attempt, pointsEarned, badge }
-            // Let's use res.pointsEarned directly
+            // Backend returns: { success: true, data: attempt, score, pointsEarned, attemptNumber }
+            // We need to use the root-level score and pointsEarned
+            const resultData = {
+                ...res.data.data, // The attempt object
+                score: res.data.score,
+                pointsEarned: res.data.pointsEarned,
+                attemptNumber: res.data.attemptNumber
+            };
+            setResult(resultData);
             toast.success(`Quiz Submitted! Score: ${res.data.score}/${quiz.questions.length}`);
-            if (onComplete) onComplete(res.data);
+            if (onComplete) onComplete(resultData);
         } catch (error) {
+            console.error('Quiz submission error:', error);
             toast.error('Failed to submit quiz');
         }
     };
@@ -89,8 +96,8 @@ const QuizTaker = ({ courseId, quizId, onComplete }) => {
                                 <label
                                     key={option._id}
                                     className={`flex items-center space-x-3 cursor-pointer p-3 rounded-lg border transition-all ${answers[q._id] === option._id
-                                            ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200'
-                                            : 'hover:bg-gray-50 border-gray-200'
+                                        ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200'
+                                        : 'hover:bg-gray-50 border-gray-200'
                                         }`}
                                 >
                                     <input
