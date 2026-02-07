@@ -11,6 +11,10 @@ const useAuthStore = create((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await authService.login(userData);
+            // Store token in localStorage
+            if (response.token) {
+                localStorage.setItem('token', response.token);
+            }
             set({ user: response.data, isAuthenticated: true, isLoading: false });
             return response;
         } catch (error) {
@@ -23,6 +27,10 @@ const useAuthStore = create((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await authService.register(userData);
+            // Store token in localStorage
+            if (response.token) {
+                localStorage.setItem('token', response.token);
+            }
             set({ user: response.data, isAuthenticated: true, isLoading: false });
             return response;
         } catch (error) {
@@ -32,6 +40,7 @@ const useAuthStore = create((set, get) => ({
     },
 
     logout: () => {
+        localStorage.removeItem('token');
         set({ user: null, isAuthenticated: false });
         // Optional: api call to logout if cookie based
     },

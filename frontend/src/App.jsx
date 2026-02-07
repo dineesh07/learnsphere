@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import useAuthStore from './store/authStore';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Home from './pages/Home';
 import Layout from './components/Layout';
 import CoursesDashboard from './pages/instructor/CoursesDashboard';
 import CreateCourse from './pages/instructor/CreateCourse';
@@ -12,6 +13,8 @@ import MyCourses from './pages/learner/MyCourses';
 import BrowseCourses from './pages/learner/BrowseCourses';
 import CoursePlayer from './pages/learner/CoursePlayer';
 import { Toaster } from 'react-hot-toast';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminLogin from './pages/AdminLogin';
 
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { isAuthenticated, user, isLoading } = useAuthStore();
@@ -40,12 +43,12 @@ function App() {
     <>
       <Toaster position="top-right" />
       <Routes>
+        <Route path="/admin" element={<AdminLogin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         <Route path="/" element={<Layout />}>
-          {/* Default Redirect */}
-          <Route index element={<Navigate to="/browse" replace />} />
+          <Route index element={<Home />} />
 
           {/* Learner Routes */}
           <Route path="browse" element={
@@ -66,7 +69,15 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="courses" element={<Navigate to="/browse" replace />} />
+          {/* Admin Routes */}
+          <Route
+            path="/admin/instructors"
+            element={
+              <ProtectedRoute roles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Instructor Routes */}
           <Route path="instructor/courses" element={

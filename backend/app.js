@@ -25,6 +25,9 @@ if (process.env.NODE_ENV === 'development') {
 // Mount routers
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/courses', courseRoutes);
+console.log('Loading admin routes...');
+app.use('/api/v1/admin', require('./routes/admin'));
+console.log('Admin routes loaded successfully');
 app.use('/api/v1/reporting', require('./routes/reporting'));
 // app.use('/api/v1/lessons', require('./routes/lesson')); // Standalone if needed
 app.use('/api/v1/quizzes', require('./routes/quiz'));

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { validatePassword } = require('../utils/passwordValidator');
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -19,13 +20,28 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please add a password'],
-        minlength: 6,
+        minlength: 8,
         select: false,
     },
     role: {
         type: String,
         enum: ['learner', 'instructor', 'admin'],
         default: 'learner',
+    },
+    // Track which admin created this instructor account
+    createdBy: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: function () {
+            return this.role === 'instructor';
+        }
+    },
+    // Approval status for instructors
+    isApproved: {
+        type: Boolean,
+        default: function () {
+            return this.role !== 'instructor'; // Auto-approve learners and admins
+        }
     },
     createdAt: {
         type: Date,
@@ -43,11 +59,13 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-// Encrypt password using bcrypt
-UserSchema.pre('save', async function (next) {
+// Hash password before saving
+UserSchema.pre('save', async function () {
     if (!this.isModified('password')) {
-        next();
+        return;
     }
+
+    // Encrypt password using bcrypt
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });

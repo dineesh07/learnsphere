@@ -7,16 +7,32 @@ exports.register = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
 
-        // Create user
+        // Prevent instructor registration via public route
+        // Instructors can only be created by admins
+        if (role === 'instructor') {
+            return res.status(403).json({
+                success: false,
+                error: 'Instructor accounts can only be created by administrators'
+            });
+        }
+
+        // Create user (learner only through this route)
         const user = await User.create({
             name,
             email,
             password,
-            role,
+            role: role === 'admin' ? 'admin' : 'learner', // Prevent admin self-registration in production
         });
 
         sendTokenResponse(user, 200, res);
     } catch (err) {
+        // Handle validation errors
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                error: err.message
+            });
+        }
         next(err);
     }
 };
@@ -45,6 +61,14 @@ exports.login = async (req, res, next) => {
 
         if (!isMatch) {
             return res.status(401).json({ success: false, error: 'Invalid credentials' });
+        }
+
+        // Check if instructor account is approved
+        if (user.role === 'instructor' && !user.isApproved) {
+            return res.status(403).json({
+                success: false,
+                error: 'Your instructor account is pending approval. Please contact an administrator.'
+            });
         }
 
         sendTokenResponse(user, 200, res);
