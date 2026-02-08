@@ -1,10 +1,12 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import HeroSection from '../components/HeroSection';
+import useAuthStore from '../store/authStore';
 import {
     Users, Clock, Star, ArrowRight, Target, Trophy,
     Monitor, Award, BookOpen, BarChart, PenTool,
     Briefcase, Globe, MessageCircle, ChevronDown, CheckCircle,
-    Zap, PlayCircle
+    Zap, PlayCircle, Mail, ExternalLink, ShieldCheck
 } from 'lucide-react';
 
 const courses = [
@@ -107,6 +109,13 @@ const faqs = [
 ];
 
 const Home = () => {
+    const { isAuthenticated } = useAuthStore();
+    const [showContactCard, setShowContactCard] = useState(false);
+
+    if (isAuthenticated) {
+        return <Navigate to="/browse" replace />;
+    }
+
     return (
         <div className="bg-background min-h-screen text-text font-sans scroll-smooth">
             <HeroSection />
@@ -131,19 +140,19 @@ const Home = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {courses.map((course) => (
-                            <div key={course.id} className="group bg-white rounded-3xl overflow-hidden hover:transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-primary/10 flex flex-col h-full">
+                            <div key={course.id} className="group bg-white rounded-2xl overflow-hidden hover:transform hover:-translate-y-1 transition-all duration-300 border border-gray-200 hover:border-indigo-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col h-full">
                                 <div className="h-56 overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
-                                    <img src={course.image} alt={course.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
-                                    <span className="absolute top-4 left-4 z-20 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <img src={course.image} alt={course.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                                    <span className="absolute top-4 left-4 z-20 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-indigo-600 shadow-sm border border-gray-100">
                                         {course.category}
                                     </span>
-                                    <button className="absolute bottom-4 right-4 z-20 w-10 h-10 rounded-full bg-white text-primary flex items-center justify-center translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-lg">
-                                        <PlayCircle size={20} fill="currentColor" className="text-primary" />
+                                    <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white text-primary flex items-center justify-center scale-75 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 shadow-lg">
+                                        <PlayCircle size={28} fill="currentColor" className="text-primary ml-1" />
                                     </button>
                                 </div>
-                                <div className="p-8 flex flex-col flex-grow">
-                                    <h3 className="text-xl font-bold text-text mb-3 line-clamp-2 group-hover:text-primary transition-colors">{course.title}</h3>
+                                <div className="p-6 flex flex-col flex-grow">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">{course.title}</h3>
                                     <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed flex-grow">{course.description}</p>
 
                                     <div className="grid grid-cols-3 gap-2 text-xs text-gray-500 mb-6 bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -341,9 +350,55 @@ const Home = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <Link to="/register" className="inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-900 px-8 py-4 text-base font-bold shadow-lg hover:bg-gray-200 transition-all transform hover:-translate-y-1 border border-gray-200">
-                                Start Teaching Today <ArrowRight className="ml-2 w-5 h-5" />
-                            </Link>
+                            <div className="relative">
+                                {!showContactCard ? (
+                                    <button
+                                        onClick={() => setShowContactCard(true)}
+                                        className="inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-900 px-8 py-4 text-base font-bold shadow-lg hover:bg-gray-200 transition-all transform hover:-translate-y-1 border border-gray-200 group"
+                                    >
+                                        Start Teaching Today <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </button>
+                                ) : (
+                                    <div className="animate-in fade-in zoom-in duration-300">
+                                        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-primary/20 shadow-2xl shadow-primary/10 max-w-md relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                                <ShieldCheck size={80} className="text-primary" />
+                                            </div>
+
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                                    <Mail size={20} />
+                                                </div>
+                                                <h4 className="font-bold text-gray-900 text-lg">Contact Administrator</h4>
+                                            </div>
+
+                                            <p className="text-gray-600 mb-6 leading-relaxed">
+                                                To become an instructor on LearnSphere, please reach out to our administration team for account verification and access.
+                                            </p>
+
+                                            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 mb-6 flex items-center justify-between group/email hover:border-primary/30 transition-colors">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Official Email</span>
+                                                    <span className="text-primary font-bold">admin@learnsphere.com</span>
+                                                </div>
+                                                <a
+                                                    href="mailto:admin@learnsphere.com"
+                                                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/5 transition-all shadow-sm border border-gray-100"
+                                                >
+                                                    <ExternalLink size={18} />
+                                                </a>
+                                            </div>
+
+                                            <button
+                                                onClick={() => setShowContactCard(false)}
+                                                className="text-gray-400 text-sm hover:text-gray-600 underline underline-offset-4 transition-colors font-medium"
+                                            >
+                                                Back to information
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

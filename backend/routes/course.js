@@ -6,7 +6,9 @@ const {
     updateCourse,
     deleteCourse,
     uploadCoursePhoto,
-    inviteUser
+    inviteUser,
+    getInstructorPublishedCourses,
+    emailCourseAttendees
 } = require('../controllers/course');
 
 // Include other resource routers
@@ -26,6 +28,11 @@ router.use('/:courseId/quizzes', quizRouter);
 router.use('/:courseId/reviews', reviewRouter);
 router.use('/:courseId/progress', progressRouter);
 
+// Instructor-specific routes (must come before generic routes)
+router
+    .route('/instructor/published')
+    .get(protect, authorize('instructor', 'admin'), getInstructorPublishedCourses);
+
 router
     .route('/')
     .get(getCourses)
@@ -43,5 +50,9 @@ router
 router
     .route('/:id/invite')
     .post(protect, authorize('instructor', 'admin'), inviteUser);
+
+router
+    .route('/:id/email-attendees')
+    .post(protect, authorize('instructor', 'admin'), emailCourseAttendees);
 
 module.exports = router;

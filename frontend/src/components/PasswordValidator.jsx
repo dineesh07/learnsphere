@@ -3,23 +3,25 @@ import { passwordRequirements } from '../utils/passwordValidation';
 
 const PasswordValidator = ({ password }) => {
     return (
-        <div className="mt-3 space-y-2">
-            <p className="text-sm font-medium text-gray-700">Password requirements:</p>
-            <div className="space-y-1">
+        <div className="space-y-3">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Security Requirements</p>
+            <div className="grid grid-cols-1 gap-2">
                 {passwordRequirements.map((requirement) => {
                     const passed = requirement.test(password);
                     return (
                         <div
                             key={requirement.id}
-                            className={`flex items-center gap-2 text-sm ${passed ? 'text-green-600' : 'text-gray-500'
+                            className={`flex items-center gap-2.5 text-sm transition-all duration-300 ${passed ? 'text-green-600 font-semibold' : 'text-gray-400'
                                 }`}
                         >
-                            {passed ? (
-                                <CheckCircle className="w-4 h-4" />
-                            ) : (
-                                <XCircle className="w-4 h-4" />
-                            )}
-                            <span>{requirement.label}</span>
+                            <div className={`p-0.5 rounded-full transition-colors ${passed ? 'bg-green-100' : 'bg-gray-100'}`}>
+                                {passed ? (
+                                    <CheckCircle className="w-3.5 h-3.5" strokeWidth={3} />
+                                ) : (
+                                    <XCircle className="w-3.5 h-3.5" />
+                                )}
+                            </div>
+                            <span className="text-[13px]">{requirement.label}</span>
                         </div>
                     );
                 })}
@@ -27,5 +29,6 @@ const PasswordValidator = ({ password }) => {
         </div>
     );
 };
+
 
 export default PasswordValidator;

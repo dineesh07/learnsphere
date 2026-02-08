@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import courseService from '../../services/courseService';
 import progressService from '../../services/progressService';
-import ReactPlayer from 'react-player';
 import QuizTaker from '../../components/QuizTaker';
 import { ChevronLeft, ChevronRight, CheckCircle, PlayCircle, FileText, HelpCircle, Menu } from 'lucide-react';
 import toast from 'react-hot-toast';
+import CustomVideoPlayer from '../../components/CustomVideoPlayer';
 
 const CoursePlayer = () => {
     const { id } = useParams();
@@ -99,6 +99,33 @@ const CoursePlayer = () => {
     // Strategy: Look in course.quizzes for a quiz that has lesson == activeLesson._id
     // Note: Backend must populate 'quizzes' and Quiz model must have 'lesson' field.
     const activeQuiz = course.quizzes?.find(q => q.lesson === activeLesson._id);
+
+
+    // Helper function to get YouTube embed URL
+    const getYouTubeEmbedUrl = (url) => {
+        if (!url) return null;
+
+        const params = '?rel=0&modestbranding=1&iv_load_policy=3&fs=0';
+
+        // Extract video ID from various YouTube URL formats
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+
+        if (match && match[2].length === 11) {
+            return `https://www.youtube.com/embed/${match[2]}${params}`;
+        }
+
+        // If it's already an embed URL, return with params appended
+        if (url.includes('youtube.com/embed/')) {
+            const separator = url.includes('?') ? '&' : '?';
+            // Avoid duplicating params if they already exist
+            if (url.includes('modestbranding')) return url;
+            return `${url}${separator}rel=0&modestbranding=1&iv_load_policy=3&fs=0`;
+        }
+
+        // For non-YouTube URLs, return null to fallback to regular video
+        return null;
+    };
 
     return (
         <div className="flex h-screen bg-gray-100 overflow-hidden font-sans">
@@ -211,40 +238,28 @@ const CoursePlayer = () => {
                                     <h1 className="text-2xl font-bold text-gray-900">{activeLesson.title}</h1>
                                     <p className="text-gray-500 mt-1">{activeLesson.type === 'video' ? 'Video Lesson' : activeLesson.type === 'quiz' ? 'Knowledge Check' : 'Reading Material'}</p>
                                 </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={handlePrev}
-                                        disabled={course.lessons.findIndex(l => l._id === activeLesson._id) === 0}
-                                        className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                                    >
-                                        <ChevronLeft />
-                                    </button>
-                                    <button
-                                        onClick={handleNext}
-                                        disabled={course.lessons.findIndex(l => l._id === activeLesson._id) === course.lessons.length - 1}
-                                        className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                                    >
-                                        <ChevronRight />
-                                    </button>
-                                </div>
                             </div>
 
                             {/* Viewer */}
                             <div className="flex-1 bg-gray-50 relative">
                                 {activeLesson.type === 'video' && (
                                     <div className="aspect-video w-full bg-black">
-                                        <ReactPlayer
-                                            url={activeLesson.videoUrl}
-                                            width="100%"
-                                            height="100%"
-                                            controls
-                                            playing={false}
-                                            config={{
-                                                youtube: {
-                                                    playerVars: { showinfo: 1 }
-                                                }
-                                            }}
-                                        />
+                                        {getYouTubeEmbedUrl(activeLesson.videoUrl) ? (
+                                            <iframe
+                                                src={getYouTubeEmbedUrl(activeLesson.videoUrl)}
+                                                title={activeLesson.title}
+                                                width="100%"
+                                                height="100%"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                                className="w-full h-full"
+                                            ></iframe>
+                                        ) : (
+                                            <CustomVideoPlayer
+                                                src={activeLesson.videoUrl}
+                                            />
+                                        )}
                                     </div>
                                 )}
 

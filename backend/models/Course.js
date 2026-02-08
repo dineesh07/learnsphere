@@ -62,6 +62,10 @@ const CourseSchema = new mongoose.Schema({
         type: Number, // in minutes
         default: 0
     },
+    viewsCount: {
+        type: Number,
+        default: 0
+    },
     averageRating: {
         type: Number,
         min: [1, 'Rating must be at least 1'],

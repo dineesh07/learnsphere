@@ -21,10 +21,10 @@ const LessonSchema = new mongoose.Schema({
     // Video fields
     videoUrl: {
         type: String,
-        match: [
-            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
-            'Please use a valid video URL',
-        ]
+        // match: [
+        //     /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
+        //     'Please use a valid video URL',
+        // ]
     },
     duration: {
         type: Number, // seconds or minutes

@@ -64,6 +64,11 @@ exports.addLesson = async (req, res, next) => {
 
         req.body.course = req.params.courseId;
 
+        // Clean up empty ObjectId fields to prevent CastError
+        if (req.body.responsiblePerson === '' || req.body.responsiblePerson === null) {
+            delete req.body.responsiblePerson;
+        }
+
         const course = await Course.findById(req.params.courseId);
 
         if (!course) {
@@ -117,6 +122,11 @@ exports.updateLesson = async (req, res, next) => {
         // if (course.instructor.toString() !== req.user.id && req.user.role !== 'admin') {
         //   return res.status(401).json({ success: false, error: `User ${req.user.id} is not authorized to update this lesson` });
         // }
+
+        // Clean up empty ObjectId fields to prevent CastError
+        if (req.body.responsiblePerson === '' || req.body.responsiblePerson === null) {
+            delete req.body.responsiblePerson;
+        }
 
         lesson = await Lesson.findByIdAndUpdate(req.params.id, req.body, {
             new: true,

@@ -19,16 +19,22 @@ exports.getProgress = async (req, res, next) => {
             });
         }
 
-        let progress = await Progress.findOne({ user: req.user.id, course: req.params.courseId });
-
-        if (!progress) {
-            console.log('Creating new progress record for user:', req.user.id, 'course:', req.params.courseId);
-            // Create initial progress if not exists
-            progress = await Progress.create({
-                user: req.user.id,
-                course: req.params.courseId
-            });
-        }
+        // Atomic find or create to prevent race conditions
+        progress = await Progress.findOneAndUpdate(
+            { user: req.user.id, course: req.params.courseId },
+            {
+                $setOnInsert: {
+                    user: req.user.id,
+                    course: req.params.courseId,
+                    completedLessons: [],
+                    percentCompleted: 0
+                }
+            },
+            {
+                new: true,   // Return the modified document rather than the original
+                upsert: true // Create the document if it doesn't exist
+            }
+        );
 
         res.status(200).json({
             success: true,

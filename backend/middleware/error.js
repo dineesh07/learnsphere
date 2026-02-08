@@ -24,6 +24,12 @@ const errorHandler = (err, req, res, next) => {
         error = { message, statusCode: 400 };
     }
 
+    // Mongoose buffering timeout (Database unreachable)
+    if (err.message && (err.message.includes('buffering timed out') || err.message.includes('timeout'))) {
+        const message = 'Database connection timed out. Please check your network or IP whitelist.';
+        error = { message, statusCode: 503 };
+    }
+
     res.status(error.statusCode || 500).json({
         success: false,
         error: error.message || 'Server Error',

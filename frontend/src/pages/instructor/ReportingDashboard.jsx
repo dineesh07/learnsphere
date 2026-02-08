@@ -101,87 +101,105 @@ const ReportingDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
+        <div className="min-h-screen bg-gray-50 text-gray-900 p-6 font-sans">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-green-400 mb-2">Reporting Dashboard</h1>
-                    <p className="text-gray-400">Track participant progress across all your courses</p>
+                <div className="mb-8 flex justify-between items-end">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Reporting Dashboard</h1>
+                        <p className="text-gray-500">Track participant progress across all your courses</p>
+                    </div>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex space-x-4 mb-6 border-b border-gray-700">
-                    <button className="px-4 py-2 text-green-400 border-b-2 border-green-400 font-medium">
+                {/* <div className="flex space-x-4 mb-6 border-b border-gray-200">
+                    <button className="px-4 py-2 text-indigo-600 border-b-2 border-indigo-600 font-medium bg-indigo-50 rounded-t-lg">
                         Overview
                     </button>
-                    <button className="px-4 py-2 text-gray-400 hover:text-gray-300">
+                    <button className="px-4 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-t-lg transition-colors">
                         Users
                     </button>
-                </div>
+                </div> */}
 
                 {/* Overview Cards */}
-                <div className="grid grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div
                         onClick={() => setFilterStatus('all')}
-                        className={`bg-gray-800 p-6 rounded-lg cursor-pointer transition-all ${filterStatus === 'all' ? 'ring-2 ring-orange-500' : 'hover:bg-gray-750'
+                        className={`bg-white p-6 rounded-xl shadow-sm border cursor-pointer transition-all ${filterStatus === 'all'
+                                ? 'border-indigo-500 ring-1 ring-indigo-500 shadow-md'
+                                : 'border-gray-200 hover:shadow-md hover:border-gray-300'
                             }`}
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <div className="text-4xl font-bold text-orange-400 mb-2">
+                                <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total Participants</div>
+                                <div className="text-3xl font-bold text-gray-900">
                                     {reportData.totalParticipants}
                                 </div>
-                                <div className="text-sm text-gray-400">Total Participants</div>
                             </div>
-                            <Users className="w-12 h-12 text-orange-400 opacity-50" />
+                            <div className="p-3 bg-indigo-50 rounded-lg">
+                                <Users className="w-6 h-6 text-indigo-600" />
+                            </div>
                         </div>
                     </div>
 
                     <div
                         onClick={() => setFilterStatus('yet-to-start')}
-                        className={`bg-gray-800 p-6 rounded-lg cursor-pointer transition-all ${filterStatus === 'yet-to-start' ? 'ring-2 ring-red-500' : 'hover:bg-gray-750'
+                        className={`bg-white p-6 rounded-xl shadow-sm border cursor-pointer transition-all ${filterStatus === 'yet-to-start'
+                                ? 'border-red-500 ring-1 ring-red-500 shadow-md'
+                                : 'border-gray-200 hover:shadow-md hover:border-gray-300'
                             }`}
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <div className="text-4xl font-bold text-red-400 mb-2">
+                                <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Yet to Start</div>
+                                <div className="text-3xl font-bold text-gray-900">
                                     {reportData.yetToStart}
                                 </div>
-                                <div className="text-sm text-gray-400">Yet to Start</div>
                             </div>
-                            <Clock className="w-12 h-12 text-red-400 opacity-50" />
+                            <div className="p-3 bg-red-50 rounded-lg">
+                                <Clock className="w-6 h-6 text-red-600" />
+                            </div>
                         </div>
                     </div>
 
                     <div
                         onClick={() => setFilterStatus('in-progress')}
-                        className={`bg-gray-800 p-6 rounded-lg cursor-pointer transition-all ${filterStatus === 'in-progress' ? 'ring-2 ring-blue-500' : 'hover:bg-gray-750'
+                        className={`bg-white p-6 rounded-xl shadow-sm border cursor-pointer transition-all ${filterStatus === 'in-progress'
+                                ? 'border-blue-500 ring-1 ring-blue-500 shadow-md'
+                                : 'border-gray-200 hover:shadow-md hover:border-gray-300'
                             }`}
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <div className="text-4xl font-bold text-blue-400 mb-2">
+                                <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">In Progress</div>
+                                <div className="text-3xl font-bold text-gray-900">
                                     {reportData.inProgress}
                                 </div>
-                                <div className="text-sm text-gray-400">In Progress</div>
                             </div>
-                            <Timer className="w-12 h-12 text-blue-400 opacity-50" />
+                            <div className="p-3 bg-blue-50 rounded-lg">
+                                <Timer className="w-6 h-6 text-blue-600" />
+                            </div>
                         </div>
                     </div>
 
                     <div
                         onClick={() => setFilterStatus('completed')}
-                        className={`bg-gray-800 p-6 rounded-lg cursor-pointer transition-all ${filterStatus === 'completed' ? 'ring-2 ring-green-500' : 'hover:bg-gray-750'
+                        className={`bg-white p-6 rounded-xl shadow-sm border cursor-pointer transition-all ${filterStatus === 'completed'
+                                ? 'border-emerald-500 ring-1 ring-emerald-500 shadow-md'
+                                : 'border-gray-200 hover:shadow-md hover:border-gray-300'
                             }`}
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <div className="text-4xl font-bold text-green-400 mb-2">
+                                <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Completed</div>
+                                <div className="text-3xl font-bold text-gray-900">
                                     {reportData.completed}
                                 </div>
-                                <div className="text-sm text-gray-400">Completed</div>
                             </div>
-                            <CheckCircle className="w-12 h-12 text-green-400 opacity-50" />
+                            <div className="p-3 bg-emerald-50 rounded-lg">
+                                <CheckCircle className="w-6 h-6 text-emerald-600" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -189,43 +207,71 @@ const ReportingDashboard = () => {
                 {/* Main Content Area */}
                 <div className="flex gap-6">
                     {/* Participants Table */}
-                    <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
+                    <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200 bg-white flex justify-between items-center">
+                            <h2 className="text-lg font-semibold text-gray-900">Detailed Report</h2>
+                            {/* <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Download CSV</button> */}
+                        </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead className="border-b border-gray-700 bg-gray-750">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-gray-50 text-gray-500 border-b border-gray-200 uppercase tracking-wider text-xs">
                                     <tr>
-                                        {visibleColumns.sno && <th className="px-4 py-3 text-left text-gray-400 font-medium">S.No</th>}
-                                        {visibleColumns.courseName && <th className="px-4 py-3 text-left text-gray-400 font-medium">Course Name</th>}
-                                        {visibleColumns.participantName && <th className="px-4 py-3 text-left text-gray-400 font-medium">Participant name</th>}
-                                        {visibleColumns.enrolledDate && <th className="px-4 py-3 text-left text-gray-400 font-medium">Enrolled Date</th>}
-                                        {visibleColumns.startDate && <th className="px-4 py-3 text-left text-gray-400 font-medium">Start date</th>}
-                                        {visibleColumns.timeSpent && <th className="px-4 py-3 text-left text-gray-400 font-medium">Time spent</th>}
-                                        {visibleColumns.completionPercentage && <th className="px-4 py-3 text-left text-gray-400 font-medium">Completion %</th>}
-                                        {visibleColumns.completedDate && <th className="px-4 py-3 text-left text-gray-400 font-medium">Completed date</th>}
-                                        {visibleColumns.status && <th className="px-4 py-3 text-left text-gray-400 font-medium">Status</th>}
+                                        {visibleColumns.sno && <th className="px-6 py-3 font-medium">S.No</th>}
+                                        {visibleColumns.courseName && <th className="px-6 py-3 font-medium">Course Name</th>}
+                                        {visibleColumns.participantName && <th className="px-6 py-3 font-medium">Participant Name</th>}
+                                        {visibleColumns.enrolledDate && <th className="px-6 py-3 font-medium">Enrolled Date</th>}
+                                        {visibleColumns.startDate && <th className="px-6 py-3 font-medium">Start Date</th>}
+                                        {visibleColumns.timeSpent && <th className="px-6 py-3 font-medium">Time Spent</th>}
+                                        {visibleColumns.completionPercentage && <th className="px-6 py-3 font-medium">Completion</th>}
+                                        {visibleColumns.completedDate && <th className="px-6 py-3 font-medium">Completed Date</th>}
+                                        {visibleColumns.status && <th className="px-6 py-3 font-medium">Status</th>}
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-gray-200">
                                     {filteredParticipants.length === 0 ? (
                                         <tr>
-                                            <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
-                                                No participants found
+                                            <td colSpan="9" className="px-6 py-10 text-center text-gray-500">
+                                                No participants found matching current filters.
                                             </td>
                                         </tr>
                                     ) : (
                                         filteredParticipants.map((participant, index) => (
-                                            <tr key={participant._id} className="border-b border-gray-700 hover:bg-gray-750">
-                                                {visibleColumns.sno && <td className="px-4 py-3 text-gray-300">{index + 1}</td>}
-                                                {visibleColumns.courseName && <td className="px-4 py-3 text-blue-400">{participant.courseName}</td>}
-                                                {visibleColumns.participantName && <td className="px-4 py-3 text-gray-300">{participant.userName}</td>}
-                                                {visibleColumns.enrolledDate && <td className="px-4 py-3 text-gray-400">{formatDate(participant.enrolledDate)}</td>}
-                                                {visibleColumns.startDate && <td className="px-4 py-3 text-gray-400">{formatDate(participant.startDate)}</td>}
-                                                {visibleColumns.timeSpent && <td className="px-4 py-3 text-red-400">{participant.timeSpent}</td>}
-                                                {visibleColumns.completionPercentage && <td className="px-4 py-3 text-cyan-400">{participant.completionPercentage}%</td>}
-                                                {visibleColumns.completedDate && <td className="px-4 py-3 text-green-400">{formatDate(participant.completedDate)}</td>}
+                                            <tr key={participant._id} className="hover:bg-gray-50 transition-colors">
+                                                {visibleColumns.sno && <td className="px-6 py-4 text-gray-500 font-medium">{index + 1}</td>}
+                                                {visibleColumns.courseName && (
+                                                    <td className="px-6 py-4">
+                                                        <div className="font-medium text-gray-900">{participant.courseName}</div>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.participantName && (
+                                                    <td className="px-6 py-4">
+                                                        <div className="font-medium text-gray-900">{participant.userName}</div>
+                                                        <div className="text-xs text-gray-500">{participant.userEmail}</div>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.enrolledDate && <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDate(participant.enrolledDate)}</td>}
+                                                {visibleColumns.startDate && <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDate(participant.startDate)}</td>}
+                                                {visibleColumns.timeSpent && <td className="px-6 py-4 text-gray-600 font-medium">{participant.timeSpent}</td>}
+                                                {visibleColumns.completionPercentage && (
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                                                                <div
+                                                                    className="bg-indigo-500 h-1.5 rounded-full"
+                                                                    style={{ width: `${participant.completionPercentage}%` }}
+                                                                ></div>
+                                                            </div>
+                                                            <span className="text-xs font-medium text-gray-600">{participant.completionPercentage}%</span>
+                                                        </div>
+                                                    </td>
+                                                )}
+                                                {visibleColumns.completedDate && <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDate(participant.completedDate)}</td>}
                                                 {visibleColumns.status && (
-                                                    <td className="px-4 py-3">
-                                                        <span className={`px-2 py-1 rounded text-xs ${getStatusColor(participant.status)}`}>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium border ${participant.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                                                participant.status === 'In progress' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                                                    'bg-red-50 text-red-700 border-red-100'
+                                                            }`}>
                                                             {participant.status}
                                                         </span>
                                                     </td>
@@ -239,22 +285,29 @@ const ReportingDashboard = () => {
                     </div>
 
                     {/* Column Customizer Sidebar */}
-                    <div className="w-64 bg-gray-800 rounded-lg p-4">
-                        <h3 className="text-sm font-semibold mb-2 text-green-400">Customizable table</h3>
-                        <p className="text-xs text-gray-400 mb-4">Pick which columns to show/hide</p>
+                    <div className="w-72 flex-shrink-0">
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sticky top-6">
+                            <h3 className="text-base font-semibold text-gray-900 mb-1">Table Columns</h3>
+                            <p className="text-xs text-gray-500 mb-5">Customize the data you want to see</p>
 
-                        <div className="space-y-3">
-                            {Object.keys(visibleColumns).map((column) => (
-                                <label key={column} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-750 p-2 rounded">
-                                    <input
-                                        type="checkbox"
-                                        checked={visibleColumns[column]}
-                                        onChange={() => toggleColumn(column)}
-                                        className="w-4 h-4 rounded border-gray-600 text-green-500 focus:ring-green-500"
-                                    />
-                                    <span className="text-sm text-gray-300">{formatColumnName(column)}</span>
-                                </label>
-                            ))}
+                            <div className="space-y-3">
+                                {Object.keys(visibleColumns).map((column) => (
+                                    <label key={column} className="flex items-center space-x-3 cursor-pointer group">
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={visibleColumns[column]}
+                                                onChange={() => toggleColumn(column)}
+                                                className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 transition-all"
+                                            />
+                                        </div>
+                                        <span className={`text-sm group-hover:text-gray-900 transition-colors ${visibleColumns[column] ? 'text-gray-700 font-medium' : 'text-gray-500'
+                                            }`}>
+                                            {formatColumnName(column)}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

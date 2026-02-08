@@ -47,6 +47,18 @@ const courseService = {
     inviteUser: async (courseId, email) => {
         const response = await api.post(`/courses/${courseId}/invite`, { email });
         return response.data;
+    },
+
+    // Get instructor's published courses for navbar
+    getInstructorPublishedCourses: async () => {
+        const response = await api.get('/courses/instructor/published');
+        return response.data;
+    },
+
+    // Email course attendees
+    emailCourseAttendees: async (courseId, data) => {
+        const response = await api.post(`/courses/${courseId}/email-attendees`, data);
+        return response.data;
     }
 };
 

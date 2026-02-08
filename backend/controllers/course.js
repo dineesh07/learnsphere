@@ -2,6 +2,28 @@ const Course = require('../models/Course');
 const path = require('path');
 const sendEmail = require('../utils/sendEmail');
 
+// @desc    Get instructor's published courses for navbar
+// @route   GET /api/v1/courses/instructor/published
+// @access  Private (Instructor)
+exports.getInstructorPublishedCourses = async (req, res, next) => {
+    try {
+        const courses = await Course.find({
+            instructor: req.user.id,
+            published: true
+        })
+            .select('title _id')
+            .sort('-createdAt');
+
+        res.status(200).json({
+            success: true,
+            count: courses.length,
+            data: courses
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 // @desc    Get all courses
 // @route   GET /api/v1/courses
 // @access  Public
@@ -106,6 +128,11 @@ exports.updateCourse = async (req, res, next) => {
             });
         }
 
+        // Clean up empty ObjectId fields to prevent CastError
+        if (req.body.responsibleUser === '' || req.body.responsibleUser === null) {
+            delete req.body.responsibleUser;
+        }
+
         course = await Course.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
@@ -190,3 +217,83 @@ exports.inviteUser = async (req, res, next) => {
         next(err);
     }
 };
+
+// @desc    Email course attendees
+// @route   POST /api/v1/courses/:id/email-attendees
+// @access  Private (Instructor/Admin)
+exports.emailCourseAttendees = async (req, res, next) => {
+    try {
+        const course = await Course.findById(req.params.id).populate('enrolledUsers', 'email name');
+        if (!course) {
+            return res.status(404).json({ success: false, error: `Course not found with id of ${req.params.id}` });
+        }
+
+        // Make sure user is course owner
+        if (course.instructor.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(401).json({
+                success: false,
+                error: `User ${req.user.id} is not authorized to email attendees of this course`
+            });
+        }
+
+        const { subject, message, recipients } = req.body;
+
+        if (!subject || !message) {
+            return res.status(400).json({ success: false, error: 'Please provide subject and message' });
+        }
+
+        // Get recipient list
+        let emailList = [];
+        if (recipients === 'all' || !recipients) {
+            // Email all enrolled users
+            emailList = course.enrolledUsers || [];
+        } else if (Array.isArray(recipients)) {
+            // Email specific users by ID
+            emailList = (course.enrolledUsers || []).filter(user =>
+                recipients.includes(user._id.toString())
+            );
+        }
+
+        if (emailList.length === 0) {
+            return res.status(400).json({ success: false, error: 'No enrolled users to email' });
+        }
+
+        // Send emails
+        const emailPromises = emailList.map(user => {
+            const emailMessage = `
+Hello ${user.name},
+
+${message}
+
+---
+This email was sent by your instructor for the course: ${course.title}
+
+Best regards,
+LearnSphere Team
+            `.trim();
+
+            return sendEmail({
+                email: user.email,
+                subject: `[${course.title}] ${subject}`,
+                message: emailMessage
+            });
+        });
+
+        try {
+            await Promise.all(emailPromises);
+            res.status(200).json({
+                success: true,
+                data: `Email sent to ${emailList.length} attendee(s)`
+            });
+        } catch (emailErr) {
+            console.error('Email sending error:', emailErr);
+            return res.status(500).json({
+                success: false,
+                error: 'Some emails could not be sent. Please try again.'
+            });
+        }
+    } catch (err) {
+        next(err);
+    }
+};
+

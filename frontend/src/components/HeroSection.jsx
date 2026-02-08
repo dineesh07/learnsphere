@@ -28,34 +28,34 @@ const HeroSection = () => {
             <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-20">
                 <div className="mx-auto max-w-3xl py-32 sm:py-48 lg:py-56 text-center">
                     <div className="mb-8 flex justify-center animate-fade-in-up">
-                        <div className="relative rounded-full px-4 py-1.5 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 transition-all cursor-default bg-white/50 backdrop-blur-md flex items-center gap-2 shadow-sm">
+                        <div className="relative rounded-full px-4 py-1.5 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 transition-all cursor-default bg-white/50 backdrop-blur-md flex items-center gap-2 shadow-sm animate-float">
                             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                            <span className="text-primary font-semibold">New</span>
-                            Interactive courses available
+                            <span className="text-primary font-bold">New</span>
+                            <span className="font-medium">Interactive courses available</span>
                         </div>
                     </div>
 
-                    <h1 className="text-5xl font-extrabold tracking-tight text-text sm:text-7xl leading-tight mb-8">
+                    <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 sm:text-7xl leading-tight mb-8 drop-shadow-sm">
                         Unlock Your Potential with <br className="hidden sm:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Expert-Led</span> Online Courses
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-500 to-secondary animate-gradient-x">Expert-Led</span> Online Courses
                     </h1>
 
-                    <p className="mt-6 text-xl leading-8 text-gray-600 max-w-2xl mx-auto">
+                    <p className="mt-6 text-xl leading-8 text-gray-600 max-w-2xl mx-auto font-light">
                         Learn new skills, advance your career, and achieve your goals with immersive, interactive courses designed by industry professionals.
                     </p>
 
                     <div className="mt-12 flex items-center justify-center gap-x-6">
                         <Link
                             to="/browse"
-                            className="group rounded-full bg-gray-100 px-8 py-4 text-base font-bold text-gray-900 shadow-lg hover:shadow-xl hover:bg-gray-200 transition-all duration-300 ease-out transform hover:-translate-y-1 flex items-center gap-2 border border-gray-200"
+                            className="group rounded-full bg-white px-8 py-4 text-base font-bold text-gray-900 shadow-md hover:shadow-xl hover:bg-gray-50 transition-all duration-300 ease-out transform hover:-translate-y-1 flex items-center gap-2 border border-gray-100"
                         >
-                            <Play fill="currentColor" size={16} /> Browse Courses
+                            <Play fill="currentColor" size={16} className="text-gray-900" /> Browse Courses
                         </Link>
                         <Link
                             to="/register"
-                            className="group rounded-full bg-white px-8 py-4 text-base font-semibold leading-6 text-text shadow-md hover:shadow-lg border border-gray-100 hover:border-gray-200 transition-all duration-300 flex items-center gap-2"
+                            className="group rounded-full bg-primary px-8 py-4 text-base font-bold text-white shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:bg-indigo-600 border border-transparent transition-all duration-300 ease-out transform hover:-translate-y-1 flex items-center gap-2"
                         >
-                            Get Started Free <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-primary" />
+                            Get Started Free <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
 

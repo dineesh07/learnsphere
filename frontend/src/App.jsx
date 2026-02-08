@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Layout from './components/Layout';
+import InstructorLayout from './components/InstructorLayout';
 import CoursesDashboard from './pages/instructor/CoursesDashboard';
 import CreateCourse from './pages/instructor/CreateCourse';
 import EditCourse from './pages/instructor/EditCourse';
@@ -15,6 +16,8 @@ import CoursePlayer from './pages/learner/CoursePlayer';
 import { Toaster } from 'react-hot-toast';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { isAuthenticated, user, isLoading } = useAuthStore();
@@ -69,6 +72,18 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+
+          <Route path="settings" element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
+
           {/* Admin Routes */}
           <Route
             path="/admin/instructors"
@@ -79,29 +94,32 @@ function App() {
             }
           />
 
-          {/* Instructor Routes */}
-          <Route path="instructor/courses" element={
+        </Route>
+
+        {/* Instructor Routes with InstructorLayout */}
+        <Route path="/instructor" element={<InstructorLayout />}>
+          <Route path="courses" element={
             <ProtectedRoute roles={['instructor', 'admin']}>
               <CoursesDashboard />
             </ProtectedRoute>
           } />
-          <Route path="instructor/courses/new" element={
+          <Route path="courses/new" element={
             <ProtectedRoute roles={['instructor', 'admin']}>
               <CreateCourse />
             </ProtectedRoute>
           } />
-          <Route path="instructor/courses/:id/edit" element={
+          <Route path="courses/:id/edit" element={
             <ProtectedRoute roles={['instructor', 'admin']}>
               <EditCourse />
             </ProtectedRoute>
           } />
-          <Route path="instructor/reporting" element={
+          <Route path="reporting" element={
             <ProtectedRoute roles={['instructor', 'admin']}>
               <ReportingDashboard />
             </ProtectedRoute>
           } />
-
         </Route>
+
       </Routes>
     </>
   );

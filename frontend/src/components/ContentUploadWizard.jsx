@@ -137,7 +137,7 @@ const ContentUploadWizard = ({ isOpen, onClose, onSubmit, contentType, courseId 
                             </label>
                             <textarea
                                 name="description"
-                                value={formData.description}
+                                value={formData.description || ''}
                                 onChange={handleInputChange}
                                 rows={3}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -149,21 +149,104 @@ const ContentUploadWizard = ({ isOpen, onClose, onSubmit, contentType, courseId 
                         {contentType === 'video' && (
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Video Link *
+                                    Video Source *
                                 </label>
-                                <input
-                                    type="url"
-                                    name="videoUrl"
-                                    value={formData.videoUrl}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="e.g., https://www.youtube.com/watch?v=..."
-                                />
-                                <p className="mt-1 text-xs text-blue-600">
-                                    (Google drive link or youtube video link is applicable)
-                                </p>
 
-                                <div className="mt-3">
+                                {/* Upload method toggle */}
+                                <div className="flex gap-2 mb-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setUploadMethod('file')}
+                                        className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${uploadMethod === 'file'
+                                            ? 'bg-purple-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        <CloudArrowUpIcon className="w-5 h-5 inline mr-2" />
+                                        Upload Video
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setUploadMethod('link')}
+                                        className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${uploadMethod === 'link'
+                                            ? 'bg-purple-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        <LinkIcon className="w-5 h-5 inline mr-2" />
+                                        External Link
+                                    </button>
+                                </div>
+
+                                {uploadMethod === 'file' ? (
+                                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
+                                        <input
+                                            type="file"
+                                            onChange={async (e) => {
+                                                const file = e.target.files[0];
+                                                if (!file) return;
+
+                                                setUploading(true);
+                                                const formDataUpload = new FormData();
+                                                formDataUpload.append('file', file);
+
+                                                try {
+                                                    const { default: uploadService } = await import('../services/uploadService');
+                                                    const response = await uploadService.uploadFile(formDataUpload);
+                                                    setFormData(prev => ({ ...prev, videoUrl: response.data.path }));
+                                                    toast.success('Video uploaded successfully');
+                                                } catch (error) {
+                                                    console.error('Upload failed:', error);
+                                                    toast.error('Failed to upload video');
+                                                } finally {
+                                                    setUploading(false);
+                                                }
+                                            }}
+                                            className="hidden"
+                                            id="video-upload"
+                                            accept="video/mp4,video/mkv,video/webm"
+                                        />
+                                        <label
+                                            htmlFor="video-upload"
+                                            className="cursor-pointer"
+                                        >
+                                            <CloudArrowUpIcon className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                                            {formData.videoUrl && !formData.videoUrl.startsWith('http') ? (
+                                                <div>
+                                                    <p className="text-green-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-xs mx-auto">
+                                                        {formData.videoUrl.split('/').pop()}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 mt-1">Click to replace</p>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <p className="text-sm text-gray-600">
+                                                        Click to upload video file
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        MP4, MKV up to 100MB
+                                                    </p>
+                                                </>
+                                            )}
+                                        </label>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <input
+                                            type="url"
+                                            name="videoUrl"
+                                            value={formData.videoUrl || ''}
+                                            onChange={handleInputChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="e.g., https://www.youtube.com/watch?v=..."
+                                        />
+                                        <p className="text-xs text-blue-600">
+                                            (YouTube, Vimeo, or generic video URL)
+                                        </p>
+                                    </div>
+                                )}
+
+                                <div className="mt-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Duration (minutes)
                                     </label>

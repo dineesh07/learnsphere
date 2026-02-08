@@ -5,10 +5,7 @@ import { Menu as MenuIcon, X, User, Sparkles } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import clsx from 'clsx';
 
-const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-];
+
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -25,7 +22,7 @@ export default function Layout() {
     };
 
     const navigation = [
-        { name: 'Home', href: '/', current: location.pathname === '/' },
+        ...(!isAuthenticated ? [{ name: 'Home', href: '/', current: location.pathname === '/' }] : []),
         { name: 'Browse', href: '/browse', current: location.pathname === '/browse' },
         ...(isAuthenticated ? [{ name: 'My Learning', href: user?.role === 'instructor' ? '/instructor/courses' : '/my-courses', current: false }] : []),
     ];
@@ -40,7 +37,7 @@ export default function Layout() {
                                 <div className="flex h-16 items-center justify-between">
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0">
-                                            <Link to="/" className="text-primary font-bold text-2xl tracking-tighter flex items-center gap-2 hover:opacity-80 transition-opacity">
+                                            <Link to={isAuthenticated ? "/browse" : "/"} className="text-primary font-bold text-2xl tracking-tighter flex items-center gap-2 hover:opacity-80 transition-opacity">
                                                 <Sparkles className="w-6 h-6 text-secondary" />
                                                 LearnSphere
                                             </Link>
@@ -70,9 +67,11 @@ export default function Layout() {
                                             {isAuthenticated ? (
                                                 <Menu as="div" className="relative ml-3">
                                                     <div>
-                                                        <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-transform hover:scale-105 shadow-sm border border-gray-200">
-                                                            <span className="absolute -inset-1.5" />
+                                                        <Menu.Button className="relative flex max-w-xs items-center gap-2 rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-transform hover:scale-105 shadow-sm border border-gray-200 pl-2 pr-1 py-1">
                                                             <span className="sr-only">Open user menu</span>
+                                                            <span className="hidden md:block font-medium text-gray-700 text-sm ml-2 mr-1">
+                                                                {user?.name || 'User'}
+                                                            </span>
                                                             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                                                                 {user?.name?.charAt(0).toUpperCase() || <User size={20} />}
                                                             </div>
@@ -88,21 +87,40 @@ export default function Layout() {
                                                         leaveTo="transform opacity-0 scale-95"
                                                     >
                                                         <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                            {userNavigation.map((item) => (
-                                                                <Menu.Item key={item.name}>
-                                                                    {({ active }) => (
-                                                                        <a
-                                                                            href={item.href}
-                                                                            className={classNames(
-                                                                                active ? 'bg-gray-50' : '',
-                                                                                'block px-4 py-2 text-sm text-gray-700'
-                                                                            )}
-                                                                        >
-                                                                            {item.name}
-                                                                        </a>
-                                                                    )}
-                                                                </Menu.Item>
-                                                            ))}
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <div className="px-4 py-3 border-b border-gray-100 mb-1">
+                                                                        <p className="text-sm leading-5">Signed in as</p>
+                                                                        <p className="truncate text-sm font-medium text-gray-900">{user?.email}</p>
+                                                                    </div>
+                                                                )}
+                                                            </Menu.Item>
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <Link
+                                                                        to="/profile"
+                                                                        className={classNames(
+                                                                            active ? 'bg-gray-50' : '',
+                                                                            'block px-4 py-2 text-sm text-gray-700'
+                                                                        )}
+                                                                    >
+                                                                        Your Profile
+                                                                    </Link>
+                                                                )}
+                                                            </Menu.Item>
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <Link
+                                                                        to="/settings"
+                                                                        className={classNames(
+                                                                            active ? 'bg-gray-50' : '',
+                                                                            'block px-4 py-2 text-sm text-gray-700'
+                                                                        )}
+                                                                    >
+                                                                        Settings
+                                                                    </Link>
+                                                                )}
+                                                            </Menu.Item>
                                                             <Menu.Item>
                                                                 {({ active }) => (
                                                                     <button
@@ -176,10 +194,8 @@ export default function Layout() {
                     )}
                 </Disclosure>
 
-                <main>
-                    <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-                        <Outlet />
-                    </div>
+                <main className="flex-1">
+                    <Outlet />
                 </main>
             </div>
         </>

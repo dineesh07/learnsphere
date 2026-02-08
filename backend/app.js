@@ -22,6 +22,9 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'));
+
 // Mount routers
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/courses', courseRoutes);
@@ -31,6 +34,7 @@ console.log('Admin routes loaded successfully');
 app.use('/api/v1/reporting', require('./routes/reporting'));
 // app.use('/api/v1/lessons', require('./routes/lesson')); // Standalone if needed
 app.use('/api/v1/quizzes', require('./routes/quiz'));
+app.use('/api/v1/upload', require('./routes/upload'));
 // app.use('/api/v1/reviews', require('./routes/review'));
 
 app.get('/', (req, res) => {

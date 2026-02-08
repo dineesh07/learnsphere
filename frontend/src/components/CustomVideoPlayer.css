@@ -1,0 +1,108 @@
+/* Scoped styles for CustomVideoPlayer */
+.custom-video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    color: #f3f4f6;
+    border-radius: 0.5rem;
+}
+
+.custom-video-wrapper video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+/* Hide default controls */
+.custom-video-wrapper video::-webkit-media-controls {
+    display: none !important;
+}
+
+.custom-controls-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    /* Allow clicks to pass through to video for play/pause */
+}
+
+/* Show controls on hover or when paused */
+.custom-video-wrapper:hover .custom-controls-overlay,
+.custom-video-wrapper.paused .custom-controls-overlay {
+    opacity: 1;
+}
+
+.custom-controls-overlay>* {
+    pointer-events: auto;
+    /* Re-enable clicks for controls */
+}
+
+/* Progress Bar (Visual Only - No Interaction) */
+.custom-progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    cursor: not-allowed;
+    /* Clear indication */
+}
+
+.custom-progress-fill {
+    height: 100%;
+    background-color: #6366f1;
+    /* Indigo 500 */
+    width: 0%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.custom-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.custom-control-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.custom-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.custom-time-display {
+    font-size: 14px;
+    font-weight: 500;
+    color: #d1d5db;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.custom-video-wrapper.fullscreen {
+    border-radius: 0;
+}
